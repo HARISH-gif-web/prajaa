@@ -673,6 +673,109 @@ const handleStatusUpdate = (req, res) => {
 app.post('/api/complaints/update-status', handleStatusUpdate);
 app.post('/api/complaints/status', handleStatusUpdate);
 
+// ==========================================================================
+// RESOLVE COMPLAINT — Authority marks a complaint fully resolved
+// ==========================================================================
+app.post('/api/complaints/resolve', (req, res) => {
+  const complaintId = req.body.id || req.body.complaint_id || req.body.ticketId;
+  const remarks = req.body.remarks || 'Grievance resolved by department authority.';
+  const officerName = req.body.officerName || req.body.officer_name || 'Department Officer';
+  const officerEmail = req.body.officerEmail || req.body.officer_email || '';
+  const officerDept = req.body.department || req.body.dept || 'Authority';
+
+  if (!complaintId) return res.status(400).json({ error: 'Complaint ID is required' });
+
+  const db = readDB();
+  const complaint = db.complaints.find(c => (c.id || '').toLowerCase() === complaintId.toLowerCase());
+  if (!complaint) return res.status(404).json({ error: `Complaint #${complaintId} not found` });
+
+  complaint.status = 'Resolved';
+  complaint.resolvedBy = { name: officerName, email: officerEmail, department: officerDept };
+  complaint.resolvedAt = new Date().toISOString();
+  complaint.resolutionRemarks = remarks;
+
+  const nowStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    + ' at ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+  if (!complaint.timeline) complaint.timeline = [];
+
+  const resolvedIdx = STAGE_CONFIGS.findIndex(s => s.name === 'Resolved');
+  STAGE_CONFIGS.forEach((stg, idx) => {
+    let existingStep = complaint.timeline.find(t =>
+      (t.status || '').toLowerCase() === stg.name.toLowerCase()
+    );
+    if (idx <= resolvedIdx) {
+      if (existingStep) {
+        existingStep.completed = true;
+        if (idx === resolvedIdx) {
+          existingStep.desc = remarks;
+          existingStep.date = nowStr;
+          existingStep.officerName = officerName;
+          existingStep.deptName = officerDept;
+        }
+      } else {
+        complaint.timeline.push({
+          status: stg.name,
+          desc: idx === resolvedIdx ? remarks : stg.desc,
+          date: nowStr,
+          completed: true,
+          officerName,
+          deptName: officerDept
+        });
+      }
+    } else {
+      if (existingStep) {
+        existingStep.completed = false;
+      } else {
+        complaint.timeline.push({
+          status: stg.name,
+          desc: stg.desc,
+          date: 'Pending',
+          completed: false,
+          officerName,
+          deptName: officerDept
+        });
+      }
+    }
+  });
+
+  writeDB(db);
+  res.json({ success: true, complaint });
+});
+
+// ==========================================================================
+// GET COMPLAINTS BY DEPARTMENT — filtered view for authority portals
+// ==========================================================================
+app.get('/api/complaints/department/:dept', (req, res) => {
+  const deptKey = (req.params.dept || '').toLowerCase().trim();
+  const db = readDB();
+  let complaints = db.complaints;
+
+  if (deptKey && deptKey !== 'all') {
+    complaints = complaints.filter(c => {
+      if (c.is_emergency || c.is_voice) return true;
+      const text = ((c.category || '') + ' ' + (c.dept || '') + ' ' + (c.subcategory || '') + ' ' +
+        (c.title || '') + ' ' + (c.description || '')).toLowerCase();
+      if (deptKey === 'food') return text.includes('food') || text.includes('ration') || text.includes('pds') || text.includes('canteen') || text.includes('meal') || text.includes('civil supplies');
+      if (deptKey === 'education') return text.includes('education') || text.includes('school') || text.includes('college') || text.includes('scholarship') || text.includes('teacher');
+      if (deptKey === 'health') return text.includes('health') || text.includes('hospital') || text.includes('doctor') || text.includes('medical') || text.includes('sanitation') || text.includes('clinic');
+      if (deptKey === 'civic') return text.includes('civic') || text.includes('municipal') || text.includes('road') || text.includes('pothole') || text.includes('street') || text.includes('water') || text.includes('drainage') || text.includes('pwd');
+      if (deptKey === 'others') return !text.includes('food') && !text.includes('education') && !text.includes('health') && !text.includes('road') && !text.includes('water');
+      return true;
+    });
+  }
+
+  complaints = [...complaints].sort((a, b) => {
+    if (a.is_emergency && !b.is_emergency) return -1;
+    if (!a.is_emergency && b.is_emergency) return 1;
+    if (a.is_voice && !b.is_voice) return -1;
+    if (!a.is_voice && b.is_voice) return 1;
+    return 0;
+  });
+
+  res.json(complaints);
+});
+
 app.post('/api/complaints/delete', (req, res) => {
   const { id } = req.body;
   const db = readDB();
