@@ -1,0 +1,13 @@
+# Node and runtime modules
+node_modules/
+.agents/
+.gemini/
+.env
+
+# Local databases and runtime state
+database.json
+uploads/
+
+# OS specific files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrajaMitra — Lodge a Grievance</title>
+    <link rel="stylesheet" href="main.css" />
+    <!-- Leaflet.js Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  </head>
+  <body>
+    <!-- TOP GOVERNMENT STRIP -->
+    <div class="gov-strip" id="main">
+      <div class="gov-left">
+        <img src="indian-flag.png" class="gov-flag" alt="Flag of India" />
+        <b data-translate="gov_title">Government of India</b>
+        <span class="divider">|</span>
+        <span>One Nation</span>
+        <span class="divider">|</span>
+        <span>One Platform</span>
+      </div>
+      <div class="gov-right">
+        <!-- Injected dynamically by accessibility.js -->
+      </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="header">
+      <a href="main.html" class="logolink">
+        <div class="brand">
+          <div class="brand-logo" style="background:none; width:auto; height:auto; border-radius:0;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="State Emblem of India" style="height:46px; width:auto;" />
+          </div>
+          <div>
+            <div class="brand-name">PrajaMitra</div>
+            <div class="brand-tag" data-translate="brand_tag">
+              Report • Track • Solve
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <div class="search">
+        <input
+          type="text"
+          placeholder="Search complaints, departments, schemes..."
+        />
+        <button>Search</button>
+      </div>
+
+      <button class="voice-btn">
+        <span class="mic">🎤</span> Voice Search
+        <span class="badge-new">New</span>
+      </button>
+
+      <!-- Injected dynamically by accessibility.js -->
+      <div id="auth-header-wrapper" style="margin-left:auto;">
+        <button class="login-btn" onclick="openAuthModal()" data-translate="login_btn">👤 Login / Register</button>
+      </div>
+      <button class="menu-btn" onclick="toggleDrawer()">☰</button>
+    </header>
+
+    <!-- MAIN CONTENT FORM WRAPPER -->
+    <main class="wrap">
+      <div class="form-container" id="form-container-box">
+        <div class="form-card">
+          <!-- Banner -->
+          <div class="form-header-banner">
+            <h2 data-translate="form_grievance_title">Lodge a Public Grievance</h2>
+            <p data-translate="form_grievance_desc">Please complete the steps below to report your issue. Your complaint will be directed to the concerned government department.</p>
+          </div>
+
+          <!-- Stepper progress -->
+          <div class="stepper">
+            <div class="stepper-progress" id="stepper-progress" style="width: 0%;"></div>
+            <div class="step active" id="step-node-1" style="flex:1;">
+              <div class="step-number">1</div>
+              <div class="step-label" data-translate="step1_title">Department &amp; Issue</div>
+            </div>
+            <div class="step" id="step-node-2" style="flex:1;">
+              <div class="step-number">2</div>
+              <div class="step-label" data-translate="step2_title">Location &amp; Uploads</div>
+            </div>
+          </div>
+
+          <!-- Form Element -->
+          <form id="grievance-form" onsubmit="event.preventDefault();">
+            
+            <!-- STEP 1: Department & Details -->
+            <div class="form-step-content active" id="step-content-1">
+              <div class="form-group">
+                <label for="grievance-category" data-translate="label_category">Select Grievance Category <span class="required">*</span></label>
+                <select id="grievance-category" class="form-control" onchange="onCategoryChange()">
+                  <option value="food">🥣 Food &amp; Public Welfare</option>
+                  <option value="civic">🏢 Civic Infrastructure</option>
+                  <option value="education">🎓 Education</option>
+                  <option value="health">❤️ Health Services</option>
+                  <option value="other">🔲 Other Issue</option>
+                </select>
+              </div>
+
+              <!-- Other Category Text Input (triggers only when select is Other) -->
+              <div class="form-group" id="other-category-wrapper" style="display:none;">
+                <label for="other-category-text">Specify Category Name <span class="required">*</span></label>
+                <input type="text" id="other-category-text" class="form-control" placeholder="e.g. Public Parks, Street Noise" />
+              </div>
+
+              <div class="form-group">
+                <label data-translate="label_subcategory">Select Subcategory <span class="required">*</span></label>
+                <div id="subcategory-buttons-container" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;">
+                  <!-- Loaded dynamically based on Category selection -->
+                </div>
+                <input type="hidden" id="subcategory-text" required />
+                <!-- Hidden custom subcategory field for 'Others' -->
+                <div id="custom-subcategory-wrapper" style="display:none; margin-top:12px;">
+                  <label for="custom-subcategory-text" style="font-size:13px; font-weight:600; color:#475569;">Specify the Problem Details <span class="required">*</span></label>
+                  <input type="text" id="custom-subcategory-text" class="form-control" placeholder="Describe the specific problem here..." />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group" style="position:relative;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label for="grievance-title" data-translate="label_short_title">Short Title of Grievance <span class="required">*</span></label>
+                    <button type="button" class="ai-gen-btn" onclick="generateAITitleAndDescription()" style="background:#eef6f0; color:#1f7a3f; border:1px solid #1f7a3f; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Auto-Generate</button>
+                  </div>
+                  <input type="text" id="grievance-title" class="form-control" placeholder="e.g. Broken drainage pipe on road 3" required />
+                </div>
+                <div class="form-group">
+                  <label data-translate="label_severity">Severity Level <span class="required">*</span></label>
+                  <div class="severity-level">
+                    <div class="sev-btn low" onclick="selectSeverity('Low', this)">Low</div>
+                    <div class="sev-btn medium selected" onclick="selectSeverity('Medium', this)">Medium</div>
+                    <div class="sev-btn high" onclick="selectSeverity('High', this)">High</div>
+                  </div>
+                  <input type="hidden" id="selected-severity" value="Medium" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="grievance-desc" data-translate="label_desc">Detailed Grievance Description (Optional)</label>
+                <textarea id="grievance-desc" class="form-control" maxlength="2000" placeholder="Please describe the issue in detail (Optional)..."></textarea>
+                <span class="upload-hint" style="float: right;" id="char-counter">0 / 2000 chars</span>
+              </div>
+
+              <div style="margin-top: 14px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+                  <input type="checkbox" id="anonymous-check" style="width:16px; height:16px;" />
+                  <span>Submit Grievance Anonymously (Hide details from public tracking)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- STEP 2: Location & Uploads -->
+            <div class="form-step-content" id="step-content-2">
+              
+              <!-- Simple Location Selector (Map Removed) -->
+              <div class="form-group">
+                <label style="font-weight:700;">Grievance Location (Optional)</label>
+                <div class="location-simple-box" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:16px; margin-top:8px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;">
+                    <button type="button" class="action-addon-btn" id="detect-gps-btn" onclick="fetchLiveGPS()" style="background:#1f7a3f; color:#fff; border:none; padding:10px 16px; border-radius:8px; display:flex; align-items:center; gap:8px;">📍 Use Live Location</button>
+                    <span class="upload-hint" id="gps-status" style="font-weight:700; color:#475569; margin:0;">No coordinates pinned yet.</span>
+                  </div>
+                  <input type="hidden" id="latitude-val" />
+                  <input type="hidden" id="longitude-val" />
+                  
+                  <label for="location-address-input" style="font-size:13px; font-weight:600; color:#475569; display:block; margin-bottom:6px;">Where did the problem happen? (Type landmark or area name)</label>
+                  <textarea id="location-address-input" class="form-control" rows="2" placeholder="Enter landmark, street name, area name or city..."></textarea>
+                </div>
+              </div>
+
+              <!-- Media Capture & upload (Optional) -->
+              <div class="form-group">
+                <label data-translate="label_uploads">Attach Supporting Documents/Images (Optional)</label>
+                
+                <!-- Camera and Voice Quick Submit controls -->
+                <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+                  <div style="display:flex; gap:10px;">
+                    <button type="button" class="action-addon-btn" style="flex:1; justify-content:center;" onclick="openBrowserCamera()">📸 Capture Photo</button>
+                  </div>
+                  <div style="display:flex; gap:10px;">
+                    <button type="button" class="action-addon-btn" id="btn-voice-normal" onclick="toggleQuickVoice(false)" style="flex:1; justify-content:center; background:#2563eb; color:#fff; font-weight:600; display:flex; align-items:center; gap:8px; border:none; border-radius:8px; padding:12px;">🎙️ Start Voice Complaint</button>
+                    <button type="button" class="action-addon-btn" id="btn-voice-emergency" onclick="toggleQuickVoice(true)" style="flex:1; justify-content:center; background:#dc2626; color:#fff; font-weight:600; display:flex; align-items:center; gap:8px; border:none; border-radius:8px; padding:12px;">🚨 Start Emergency Voice Complaint</button>
+                  </div>
+                  <div id="quick-voice-status-box" style="display:none; text-align:center; padding:10px; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; font-weight:600; color:#b91c1c;">
+                    <span style="display:inline-block; width:10px; height:10px; background:#ef4444; border-radius:50%; margin-right:8px; animation: pulse-record 1s infinite;"></span>
+                    Recording Active: Click the red stop button again to end and automatically register complaint!
+                  </div>
+                </div>
+
+                <!-- Hidden video preview container for live capture -->
+                <div class="camera-modal-container" id="camera-capture-box" style="display:none;">
+                  <video class="video-feed-preview" id="camera-feed" autoplay playsinline></video>
+                  <canvas id="camera-canvas" style="display:none;" width="320" height="240"></canvas>
+                  <div class="camera-controls-row">
+                    <button type="button" class="btn btn-primary" onclick="takeSnapshot()">Take Snapshot</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeBrowserCamera()">Cancel</button>
+                  </div>
+                </div>
+
+                <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+                  <span class="upload-icon">📁</span>
+                  <span class="upload-text"><span>Click to upload</span> files manually</span>
+                  <span class="upload-hint">Upload photos, videos, or audio recordings (Max size 10MB each)</span>
+                  <input type="file" id="file-input" style="display: none;" multiple accept="image/*,video/*,audio/*,application/pdf" onchange="handleFileSelect(event)" />
+                </div>
+                <div class="preview-container" id="preview-container"></div>
+              </div>
+
+              <div style="margin-top:20px; padding:15px; background:#f8fafc; border-radius:8px; border:1px solid #cbd5e1;">
+                <label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; font-size: 13px; color: #475569; cursor: pointer;">
+                  <input type="checkbox" id="consent-check" style="margin-top: 3px;" required />
+                  I hereby declare that the details furnished above are true and correct to the best of my knowledge. I am aware that filing false grievances is subject to official penalties.
+                </label>
+              </div>
+            </div>
+
+            <!-- Footer navigation -->
+            <div class="form-footer">
+              <button type="button" class="btn btn-secondary" id="btn-back" onclick="navigateStep(-1)" disabled>
+                &larr; Back
+              </button>
+              <button type="button" class="btn btn-primary" id="btn-next" onclick="navigateStep(1)">
+                Next Step &rarr;
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Grievance success receipt panel -->
+      <div class="form-container" id="receipt-container-box" style="display:none;">
+        <div class="form-card" style="padding:40px; text-align:center;">
+          <div class="success-checkmark-wrap" style="width:80px; height:80px; font-size:40px;">✓</div>
+          <h2 style="font-size:26px; font-weight:800; color:#0f172a; margin-bottom:8px;">Grievance Submitted Successfully!</h2>
+          <p style="color:#64748b; font-size:14px; margin-bottom:24px;">Your complaint has been successfully registered in the portal database. Please download your receipt below.</p>
+          
+          <div class="ticket-info-box" id="print-receipt-section" style="max-width:540px; margin:0 auto 24px; text-align:left; border:1px solid #cbd5e1; border-radius:12px; padding:24px;">
+            <h3 style="border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:12px; color:#1f7a3f;">PRASAMITRA GRIEVANCE RECEIPT</h3>
+            <div class="ticket-field" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Complaint Ticket ID</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="ticket-val-id" id="receipt-ticket-id">PM-2026-X2938</span>
+                <button type="button" class="btn btn-secondary" onclick="copyTicketID()" style="padding: 4px 8px; font-size: 11px; margin: 0; line-height: 1; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #1f7a3f; color: #1f7a3f; background: #f0fdf4;">
+                  📋 Copy
+                </button>
+              </div>
+            </div>
+            <div class="ticket-field">
+              <span>Submission Date &amp; Time</span>
+              <span class="ticket-val-bold" id="receipt-date">July 29, 2026</span>
+            </div>
+            <div class="ticket-field">
+              <span>Grievance Title</span>
+              <span class="ticket-val-bold" id="receipt-title">Broken road on sector 4</span>
+            </div>
+            <div class="ticket-field">
+              <span>Assigned Department</span>
+              <span class="ticket-val-bold" id="receipt-dept">Department of Roads &amp; Transport</span>
+            </div>
+            <div class="ticket-field">
+              <span>Estimated Resolution Date</span>
+              <span class="ticket-val-bold" id="receipt-eta">Aug 05, 2026</span>
+            </div>
+            <div style="margin-top:20px; font-size:10px; color:#94a3b8; text-align:center; border-top:1px dashed #cbd5e1; padding-top:12px;">
+              This is a computer-generated grievance receipt. No signature is required.
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:center; gap:12px; max-width:540px; margin:0 auto;">
+            <button class="btn btn-secondary" onclick="location.href='main.html'" style="flex:1; justify-content:center;">Return Home</button>
+            <button class="btn btn-secondary" onclick="printReceipt()" style="flex:1; justify-content:center; background:#ff9933; color:#ffffff; border:none;">Download Receipt (PDF)</button>
+            <button class="btn btn-primary" id="receipt-track-btn" style="flex:1; justify-content:center;">Track Complaint</button>
+          </div>
+        </div>
+      </div>
+</main>
+
+    <!-- Leaflet JS Map -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="translate.js"></script>
+    <script src="accessibility.js"></script>
+    
+    <script>
+      let currentStep = 1;
+      let selectedSeverity = 'Medium';
+      let cameraStream = null;
+      let audioRecorder = null;
+      let audioChunks = [];
+      let isAudioRecording = false;
+
+      // Local variables to hold media blobs for submission
+      let attachedPhotoBlob = null;
+      let attachedAudioBlob = null;
+      let manualFiles = [];
+
+      const subcategoriesData = {
+        food: ["Ration Shop Delay", "Food Quality Issue", "Drinking Water Supply", "Mid-day Meal Delay", "Welfare Scheme Issue"],
+        civic: ["Road Pothole", "Drainage Leakage", "Garbage Accumulation", "Streetlight Malfunction", "Traffic Congestion"],
+        education: ["School Infrastructure", "Scholarship Delay", "Hostel Facilities", "Teacher Shortage", "Fee Issue"],
+        health: ["Doctor Absence", "Medicine Shortage", "Sanitation Issue", "Ambulance Delay", "Hospital Hygiene"],
+        other: ["Police Inaction", "Telecommunications", "Transport Issues", "General Inquiry", "Other Grievance"]
+      };
+
+      const mockAIPredictions = {
+        food: {
+          "Ration Shop Delay": {
+            title: "Delay in Ration Card Distribution & Monthly Grain Supply",
+            desc: "I am raising this complaint to report that the local fair price shop has not distributed the monthly rations for the last 15 days, causing severe hardship to all cardholders in our locality."
+          },
+          "Food Quality Issue": {
+            title: "Substandard Quality of Grains Distributed at Public Depot",
+            desc: "The quality of wheat and rice distributed at the fair price shop is extremely poor and contains sand particles and insects. It is unfit for human consumption."
+          },
+          "Drinking Water Supply": {
+            title: "Irregular and Contaminated Municipal Drinking Water Supply",
+            desc: "Drinking water is supplied only once a week, and it comes out muddy with a foul smell. Requesting urgent cleaning of the local reservoir."
+          },
+          "Mid-day Meal Delay": {
+            title: "Disruption in Mid-day Meal Scheme in Local School",
+            desc: "The mid-day meal scheme has been non-functional for the past week in the local municipal school due to raw material shortages. Children are not receiving their lunch."
+          },
+          "Welfare Scheme Issue": {
+            title: "Delay in Disbursement of Public Welfare Pension Benefits",
+            desc: "The monthly welfare pension scheme amount has not been credited to the beneficiaries' bank accounts for three consecutive months. Urgent verification needed."
+          }
+        },
+        civic: {
+          "Road Pothole": {
+            title: "Major Potholes on Main Crossing Causing Frequent Accidents",
+            desc: "The main road is filled with huge potholes that fill up during rains, causing traffic blocks and minor motor accidents every day. Needs immediate resurfacing."
+          },
+          "Drainage Leakage": {
+            title: "Overflown Sewage Lines Causing Dirty Water Accumulation",
+            desc: "The sewage line has blocked and dirty black water is leaking out onto the footpath, causing a terrible odor and creating health hazards for residents."
+          },
+          "Garbage Accumulation": {
+            title: "Unattended Garbage Dump Piling Up in Residential Street",
+            desc: "The municipal garbage truck has not cleared the garbage bin at this corner for over 10 days. The waste is overflowing and spreading onto the street."
+          },
+          "Streetlight Malfunction": {
+            title: "Non-functional Streetlights Creating Dark Safety Hazards",
+            desc: "All streetlights from building 4 to building 10 have been out of order for the last two weeks, making it extremely unsafe for women and children at night."
+          },
+          "Traffic Congestion": {
+            title: "Chaotic Traffic Congestion and Lack of Signals at Crossroad",
+            desc: "Traffic jams are lasting for hours at the main junction due to broken signals and lack of traffic police monitoring during peak office hours."
+          }
+        },
+        education: {
+          "School Infrastructure": {
+            title: "Dilapidated Classroom Roofs and Lack of Benches in Govt School",
+            desc: "The classroom roofs are leaking water during rains, and pupils have to sit on the floor due to broken benches. Urgent repairs required."
+          },
+          "Scholarship Delay": {
+            title: "Unreasonable Delay in Granting Annual Scholarship Funds",
+            desc: "The state higher education scholarship funds have not been disbursed for the current academic session, causing financial distress to eligible candidates."
+          },
+          "Hostel Facilities": {
+            title: "Unhygienic Toilets and Lack of Proper Food in Govt Hostel",
+            desc: "The boy's/girl's hostel is in a state of neglect with unusable toilets and poorly cooked, unhygienic meals served in the mess."
+          },
+          "Teacher Shortage": {
+            title: "Severe Shortage of Teaching Staff in Primary Classes",
+            desc: "There are only 2 teachers available for 5 primary classes in the school. The curriculum is severely lagging due to staffing shortages."
+          },
+          "Fee Issue": {
+            title: "Arbitrary Fee Increase by Private Management Against Norms",
+            desc: "The local school administration has suddenly increased the tuition fee by 30% without proper authorization, which is a direct violation of state regulations."
+          }
+        },
+        health: {
+          "Doctor Absence": {
+            title: "Lack of Attending Doctors at Primary Health Center Clinic",
+            desc: "Patients are waiting in long queues since morning, but no medical officers or attending doctors have arrived at the local health clinic."
+          },
+          "Medicine Shortage": {
+            title: "Shortage of Essential Lifesaving Medicines at Health Depot",
+            desc: "Patients are forced to buy basic medicines from private pharmacies because the government health center has been out of stock for weeks."
+          },
+          "Sanitation Issue": {
+            title: "Unhygienic Conditions and Garbage Dumps in Local Clinic Area",
+            desc: "Medical waste and plastic wrap are dumped in open areas behind the clinic ward, posing a high risk of hospital-acquired infections."
+          },
+          "Ambulance Delay": {
+            title: "Delayed Ambulance Emergency Response Services",
+            desc: "The emergency ambulance services took more than an hour to respond to a critical heart attack call in the block, highlighting severe neglect."
+          },
+          "Hospital Hygiene": {
+            title: "Extremely Dirty Beds and Inadequate Cleaning in General Ward",
+            desc: "The hospital beds are not changed, and dust/grime has accumulated in the wards. Sweepers are not clearing waste bins regularly."
+          }
+        },
+        other: {
+          "Police Inaction": {
+            title: "Delay in Registering Police Report (FIR) for Wallet Theft",
+            desc: "The local police desk has refused to register an FIR for my stolen wallet and mobile, asking me to wait indefinitely without reason."
+          },
+          "Telecommunications": {
+            title: "Frequent Telecom Network Outages and Poor Connectivity",
+            desc: "The mobile phone network towers are frequently down in our village block, causing severe disruptions to daily communication and online studies."
+          },
+          "Transport Issues": {
+            title: "Irregular State Bus Service timings on Route 45B",
+            desc: "The scheduled state buses are frequently skipping their runs, leaving daily commuters and students stranded for hours on the main stops."
+          },
+          "General Inquiry": {
+            title: "General Grievance: Delay in Processing Citizen Certificates",
+            desc: "My application for local resident certificate has been stuck in 'pending' status for more than 45 days at the municipal office."
+          },
+          "Other Grievance": {
+            title: "General Grievance Query",
+            desc: "I am submitting this grievance to request assistance on a custom issue that needs review and escalation."
+          }
+        }
+      };
+
+      window.onload = function() {
+        const hash = window.location.hash.substring(1);
+        const select = document.getElementById('grievance-category');
+        
+        if (hash && ['food', 'civic', 'education', 'health', 'other'].includes(hash)) {
+          select.value = hash;
+        }
+        onCategoryChange();
+        updateStepperUI();
+      };
+
+      // Select Category change trigger
+      function onCategoryChange() {
+        const cat = document.getElementById('grievance-category').value;
+        const otherWrap = document.getElementById('other-category-wrapper');
+        const otherText = document.getElementById('other-category-text');
+        
+        if (cat === 'other') {
+          otherWrap.style.display = 'block';
+          otherText.required = true;
+        } else {
+          otherWrap.style.display = 'none';
+          otherText.required = false;
+          otherText.value = '';
+        }
+        
+        renderSubcategoryButtons();
+      }
+
+      function renderSubcategoryButtons() {
+        const category = document.getElementById('grievance-category').value;
+        const container = document.getElementById('subcategory-buttons-container');
+        const hiddenInput = document.getElementById('subcategory-text');
+        const customWrapper = document.getElementById('custom-subcategory-wrapper');
+        const customInput = document.getElementById('custom-subcategory-text');
+        
+        container.innerHTML = '';
+        hiddenInput.value = ''; // Reset selection
+        customWrapper.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+        
+        const list = subcategoriesData[category] || subcategoriesData['other'];
+        list.forEach(sub => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'subcategory-btn';
+          btn.innerText = sub;
+          btn.onclick = () => {
+            container.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            hiddenInput.value = sub;
+            customWrapper.style.display = 'none';
+            customInput.required = false;
+          };
+          container.appendChild(btn);
+        });
+
+        // Add "Others" subcategory button
+        const otherBtn = document.createElement('button');
+        otherBtn.type = 'button';
+        otherBtn.className = 'subcategory-btn';
+        otherBtn.innerText = 'Others';
+        otherBtn.onclick = () => {
+          container.querySelectorAll('.subcategory-btn').forEach(b => b.classList.remove('active'));
+          otherBtn.classList.add('active');
+          hiddenInput.value = 'Others';
+          customWrapper.style.display = 'block';
+          customInput.required = true;
+          customInput.focus();
+        };
+        container.appendChild(otherBtn);
+      }
+
+      function generateAITitleAndDescription() {
+        const category = document.getElementById('grievance-category').value;
+        const subcategory = document.getElementById('subcategory-text').value;
+        
+        if (!subcategory) {
+          alert("Please select a Subcategory button first so the AI has context!");
+          return;
+        }
+        
+        let customSubText = "";
+        if (subcategory === 'Others') {
+          customSubText = document.getElementById('custom-subcategory-text').value.trim();
+          if (!customSubText) {
+            alert("Please type a brief detail in the Specify the Problem box so the AI can build a description!");
+            return;
+          }
+        }
+        
+        // Show loading state on button
+        const aiBtn = document.querySelector('.ai-gen-btn');
+        const oldBtnText = aiBtn.innerHTML;
+        aiBtn.innerHTML = '✨ Generating...';
+        aiBtn.disabled = true;
+        
+        fetch((window.API_BASE || '') + '/api/ai/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category, subcategory, customSubText })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error('Backend generation failure');
+          return res.json();
+        })
+        .then(data => {
+          if (data.title && data.description) {
+            document.getElementById('grievance-title').value = data.title;
+            document.getElementById('grievance-desc').value = data.description;
+            document.getElementById('char-counter').innerText = `${data.description.length} / 2000 chars`;
+            
+            // Visual success indicator
+            const tField = document.getElementById('grievance-title');
+            const dField = document.getElementById('grievance-desc');
+            tField.style.borderColor = '#1f7a3f';
+            dField.style.borderColor = '#1f7a3f';
+            setTimeout(() => {
+              tField.style.borderColor = '';
+              dField.style.borderColor = '';
+            }, 1000);
+          } else {
+            throw new Error('Invalid JSON format received');
+          }
+        })
+        .catch(err => {
+          console.warn('AI API call failed, falling back to local database predictions:', err);
+          // Fallback local predictions logic
+          let titleText = "";
+          let descText = "";
+          
+          if (subcategory === 'Others') {
+            titleText = `${customSubText} Grievance`;
+            descText = `This complaint is raised to report: ${customSubText}. Requesting immediate inspection, action, and resolution by the concerned department.`;
+          } else {
+            const data = mockAIPredictions[category] && mockAIPredictions[category][subcategory];
+            if (data) {
+              titleText = data.title;
+              descText = data.desc;
+            } else {
+              titleText = `${subcategory} Grievance`;
+              descText = `I am facing an issue regarding ${subcategory}. Please look into this matter and resolve it at the earliest.`;
+            }
+          }
+          
+          document.getElementById('grievance-title').value = titleText;
+          document.getElementById('grievance-desc').value = descText;
+          document.getElementById('char-counter').innerText = `${descText.length} / 2000 chars`;
+          
+          // Flash orange border for fallback notification
+          const tField = document.getElementById('grievance-title');
+          const dField = document.getElementById('grievance-desc');
+          tField.style.borderColor = '#f59e0b';
+          dField.style.borderColor = '#f59e0b';
+          setTimeout(() => {
+            tField.style.borderColor = '';
+            dField.style.borderColor = '';
+          }, 1000);
+        })
+        .finally(() => {
+          aiBtn.innerHTML = oldBtnText;
+          aiBtn.disabled = false;
+        });
+      }
+
+      function selectSeverity(level, btn) {
+        document.querySelectorAll('.severity-level .sev-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedSeverity = level;
+      }
+
+      // Stepper UI controller
+      function updateStepperUI() {
+        const progress = ((currentStep - 1) / 1) * 100;
+        document.getElementById('stepper-progress').style.width = progress + '%';
+        
+        for (let i = 1; i <= 2; i++) {
+          const node = document.getElementById('step-node-' + i);
+          if (i < currentStep) node.className = 'step completed';
+          else if (i === currentStep) node.className = 'step active';
+          else node.className = 'step';
+
+          const content = document.getElementById('step-content-' + i);
+          if (i === currentStep) content.classList.add('active');
+          else content.classList.remove('active');
+        }
+
+        const back = document.getElementById('btn-back');
+        const next = document.getElementById('btn-next');
+
+        back.disabled = (currentStep === 1);
+        if (currentStep === 2) {
+          next.innerHTML = 'Submit Complaint ✓';
+        } else {
+          next.innerHTML = 'Next Step &rarr;';
+        }
+      }
+
+      function validateStep() {
+        if (currentStep === 1) {
+          const cat = document.getElementById('grievance-category').value;
+          const otherText = document.getElementById('other-category-text').value;
+          const sub = document.getElementById('subcategory-text').value;
+          const title = document.getElementById('grievance-title').value;
+
+          if (cat === 'other' && !otherText.trim()) {
+            alert('Please specify the category name!');
+            return false;
+          }
+          if (!sub.trim()) {
+            alert('Please select a subcategory button!');
+            return false;
+          }
+          if (sub === 'Others') {
+            const customSub = document.getElementById('custom-subcategory-text').value;
+            if (!customSub.trim()) {
+              alert('Please specify your custom problem detail in the text box!');
+              return false;
+            }
+          }
+          if (!title.trim()) {
+            alert('Please enter a title for your grievance!');
+            return false;
+          }
+          return true;
+        }
+        if (currentStep === 2) {
+          const consent = document.getElementById('consent-check').checked;
+          if (!consent) {
+            alert('You must accept the terms declaration before submitting.');
+            return false;
+          }
+          return true;
+        }
+        return true;
+      }
+
+      function navigateStep(direction) {
+        if (direction === 1) {
+          if (!validateStep()) return;
+          if (currentStep === 2) {
+            submitComplaintAPI();
+            return;
+          }
+          currentStep++;
+        } else {
+          currentStep--;
+        }
+        updateStepperUI();
+        window.scrollTo(0, 0);
+      }
+
+      // GPS Lookup with Reverse Geocoding
+      function fetchLiveGPS() {
+        const statusText = document.getElementById('gps-status');
+        const detectBtn = document.getElementById('detect-gps-btn');
+        const addressBox = document.getElementById('location-address-input');
+        
+        detectBtn.innerText = 'Locating...';
+        statusText.innerText = 'Fetching coordinates...';
+        
+        if (!navigator.geolocation) {
+          statusText.innerText = 'GPS is not supported by your browser.';
+          detectBtn.innerText = '📍 Use Live Location';
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            
+            document.getElementById('latitude-val').value = lat;
+            document.getElementById('longitude-val').value = lng;
+            statusText.innerText = `Coordinates Pinned: ${lat.toFixed(5)}° N, ${lng.toFixed(5)}° E`;
+            statusText.style.color = '#1f7a3f';
+            detectBtn.innerText = '📍 Re-detect Location';
+            
+            addressBox.value = 'Locating address...';
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data && data.display_name) {
+                  addressBox.value = data.display_name;
+                } else {
+                  addressBox.value = `Guntur region, Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`;
+                }
+              })
+              .catch(err => {
+                addressBox.value = `Guntur region, Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`;
+              });
+          },
+          (err) => {
+            console.warn('Geolocation failed:', err);
+            const lat = 16.3067 + (Math.random() - 0.5) * 0.02;
+            const lng = 80.4365 + (Math.random() - 0.5) * 0.02;
+            document.getElementById('latitude-val').value = lat;
+            document.getElementById('longitude-val').value = lng;
+            statusText.innerText = `GPS simulated: ${lat.toFixed(5)}° N, ${lng.toFixed(5)}° E`;
+            statusText.style.color = '#dc2626';
+            detectBtn.innerText = '📍 Use Live Location';
+            addressBox.value = 'Simulated Municipal Office, Guntur';
+          },
+          { enableHighAccuracy: true, timeout: 6000 }
+        );
+      }
+
+      // ==========================================================================
+      // CAMERA PHOTO CAPTURE & AUDIO RECORDER
+      // ==========================================================================
+      function openBrowserCamera() {
+        const box = document.getElementById('camera-capture-box');
+        const video = document.getElementById('camera-feed');
+        box.style.display = 'flex';
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => {
+            cameraStream = stream;
+            video.srcObject = stream;
+          })
+          .catch(err => {
+            alert('Webcam access was denied or is not available. Please upload a photo manually.');
+            box.style.display = 'none';
+          });
+      }
+
+      function closeBrowserCamera() {
+        const box = document.getElementById('camera-capture-box');
+        box.style.display = 'none';
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(track => track.stop());
+        }
+      }
+
+      function takeSnapshot() {
+        const video = document.getElementById('camera-feed');
+        const canvas = document.getElementById('camera-canvas');
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob(blob => {
+          attachedPhotoBlob = blob;
+          const container = document.getElementById('preview-container');
+          
+          const old = container.querySelector('.file-preview[data-snap="true"]');
+          if (old) old.remove();
+
+          const preview = document.createElement('div');
+          preview.className = 'file-preview';
+          preview.dataset.snap = 'true';
+          preview.innerHTML = `
+            <img src="${URL.createObjectURL(blob)}" alt="Captured Snapshot">
+            <div class="file-preview-name">CapturedSnap.png</div>
+            <button type="button" class="file-remove-btn" onclick="attachedPhotoBlob=null; this.parentElement.remove()">×</button>
+          `;
+          container.appendChild(preview);
+          closeBrowserCamera();
+        }, 'image/png');
+      }
+
+      // Voice & Emergency Voice quick recording and submit logic
+      function toggleQuickVoice(isEmergency) {
+        const btnId = isEmergency ? 'btn-voice-emergency' : 'btn-voice-normal';
+        const otherBtnId = isEmergency ? 'btn-voice-normal' : 'btn-voice-emergency';
+        const btn = document.getElementById(btnId);
+        const otherBtn = document.getElementById(otherBtnId);
+        const statusBox = document.getElementById('quick-voice-status-box');
+        
+        if (isAudioRecording) {
+          audioRecorder.stop();
+          
+          document.getElementById('btn-voice-normal').innerText = '🎙️ Start Voice Complaint';
+          document.getElementById('btn-voice-normal').style.backgroundColor = '#2563eb';
+          document.getElementById('btn-voice-emergency').innerText = '🚨 Start Emergency Voice Complaint';
+          document.getElementById('btn-voice-emergency').style.backgroundColor = '#dc2626';
+          otherBtn.disabled = false;
+          statusBox.style.display = 'none';
+          
+          isAudioRecording = false;
+        } else {
+          navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+              audioRecorder = new MediaRecorder(stream);
+              audioChunks = [];
+              
+              audioRecorder.ondataavailable = e => {
+                audioChunks.push(e.data);
+              };
+
+              audioRecorder.onstop = () => {
+                attachedAudioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                stream.getTracks().forEach(t => t.stop());
+                
+                // Immediately submit
+                submitVoiceComplaintAPI(isEmergency);
+              };
+
+              audioRecorder.start();
+              isAudioRecording = true;
+              
+              btn.innerText = `⏹️ Stop & Submit ${isEmergency ? 'Emergency' : 'Voice'}`;
+              btn.style.backgroundColor = '#4b5563'; 
+              otherBtn.disabled = true;
+              
+              statusBox.style.display = 'block';
+              statusBox.innerText = `Recording active: Click the STOP button above to finish and automatically submit ${isEmergency ? 'Emergency' : 'Voice'} complaint!`;
+            })
+            .catch(err => {
+              alert('Microphone access denied or not available.');
+            });
+        }
+      }
+
+      function submitVoiceComplaintAPI(isEmergency) {
+        const category = isEmergency ? 'other' : (document.getElementById('grievance-category').value || 'other');
+        const subcategory = isEmergency ? 'Emergency Voice' : 'Voice Note';
+        const title = isEmergency ? '🚨 Emergency Voice Grievance' : '🎙️ Voice Note Grievance';
+        
+        let description = document.getElementById('grievance-desc').value.trim();
+        if (!description) {
+          description = isEmergency 
+            ? "Emergency Voice Complaint registered by citizen. Urgent attention required." 
+            : "Voice Complaint registered by citizen.";
+        }
+        
+        const severity = isEmergency ? 'High' : 'Medium';
+        const lat = document.getElementById('latitude-val').value || '16.3067';
+        const lng = document.getElementById('longitude-val').value || '80.4365';
+        const address = document.getElementById('location-address-input').value.trim() || 'Not specified';
+        const anonymous = document.getElementById('anonymous-check').checked;
+
+        const isAuth = !!localStorage.getItem('prajamitra_token');
+        const name = isAuth ? 'Registered Citizen' : 'Anonymous Reporter';
+        const phone = localStorage.getItem('prajamitra_user_phone') || '';
+        const email = localStorage.getItem('prajamitra_user_email') || '';
+
+        const formData = new FormData();
+        formData.append('category', category);
+        formData.append('subcategory', subcategory);
+        formData.append('title', title);
+        formData.append('description', `${description}\nLocation Detail: ${address}`);
+        formData.append('severity', severity);
+        formData.append('latitude', lat);
+        formData.append('longitude', lng);
+        formData.append('anonymous', anonymous ? 'true' : 'false');
+        formData.append('name', name);
+        formData.append('phone', phone);
+        formData.append('email', email);
+
+        if (attachedAudioBlob) {
+          formData.append('audio', attachedAudioBlob, 'voice_complaint.wav');
+        }
+        if (attachedPhotoBlob) {
+          formData.append('photo', attachedPhotoBlob, 'photo.png');
+        }
+
+        fetch((window.API_BASE || '') + '/api/complaints', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert('Submission error: ' + data.error);
+          } else {
+            document.getElementById('form-container-box').style.display = 'none';
+            document.getElementById('receipt-container-box').style.display = 'block';
+
+            document.getElementById('receipt-ticket-id').innerText = data.id;
+            document.getElementById('receipt-date').innerText = data.date;
+            document.getElementById('receipt-title').innerText = data.title;
+            document.getElementById('receipt-dept').innerText = data.dept;
+            document.getElementById('receipt-eta').innerText = data.eta;
+            
+            document.getElementById('receipt-track-btn').onclick = () => {
+              location.href = `track.html?id=${data.id}`;
+            };
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Error connecting to backend server. Make sure the server is active!');
+        });
+      }
+
+      function handleFileSelect(event) {
+        const files = event.target.files;
+        const container = document.getElementById('preview-container');
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          manualFiles.push(file);
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.createElement('div');
+            preview.className = 'file-preview';
+            preview.dataset.name = file.name;
+            
+            let mediaHtml = '';
+            if (file.type.startsWith('image/')) {
+              mediaHtml = `<img src="${e.target.result}" alt="${file.name}">`;
+            } else {
+              mediaHtml = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 24px; background: #e2e8f0; color: #475569;">📄</div>`;
+            }
+            
+            preview.innerHTML = `
+              ${mediaHtml}
+              <div class="file-preview-name">${file.name}</div>
+              <button type="button" class="file-remove-btn" onclick="removeManualFile('${file.name}', this)">×</button>
+            `;
+            container.appendChild(preview);
+          }
+          if (file.type.startsWith('image/')) {
+            reader.readAsDataURL(file);
+          } else {
+             reader.readAsDataURL(new Blob([])); // Trigger dummy load for non-images
+          }
+        }
+      }
+
+      function removeManualFile(name, btn) {
+        manualFiles = manualFiles.filter(f => f.name !== name);
+        btn.parentElement.remove();
+      }
+
+      document.getElementById('grievance-desc').oninput = function() {
+        document.getElementById('char-counter').innerText = this.value.length + ' / 2000 chars';
+      };
+
+      // ==========================================================================
+      // FORM SUBMIT API CALL TO backend
+      // ==========================================================================
+      function submitComplaintAPI() {
+        const nextBtn = document.getElementById('btn-next');
+        nextBtn.innerText = 'Submitting...';
+        nextBtn.disabled = true;
+
+        const category = document.getElementById('grievance-category').value;
+        const otherCategoryText = document.getElementById('other-category-text').value;
+        
+        const subcategory = document.getElementById('subcategory-text').value;
+        const customSubcategory = document.getElementById('custom-subcategory-text').value;
+        const subValue = subcategory === 'Others' ? customSubcategory : subcategory;
+        
+        const title = document.getElementById('grievance-title').value;
+        const baseDesc = document.getElementById('grievance-desc').value;
+        const address = document.getElementById('location-address-input').value.trim();
+        const description = address ? `${baseDesc}\n\nLocation Detail: ${address}` : baseDesc;
+        
+        const severity = selectedSeverity;
+        const lat = document.getElementById('latitude-val').value || '16.3067';
+        const lng = document.getElementById('longitude-val').value || '80.4365';
+        const anonymous = document.getElementById('anonymous-check').checked;
+
+        const isAuth = !!localStorage.getItem('prajamitra_token');
+        const email = localStorage.getItem('prajamitra_user_email') || '';
+        const phone = localStorage.getItem('prajamitra_user_phone') || '';
+        const storedName = localStorage.getItem('prajamitra_user_name');
+        const defaultName = email ? email.split('@')[0] : 'Registered Citizen';
+        const name = isAuth ? (storedName || defaultName) : 'Anonymous Reporter';
+
+        const formData = new FormData();
+        formData.append('category', category === 'other' ? otherCategoryText : category);
+        formData.append('subcategory', subValue);
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('severity', severity);
+        formData.append('latitude', lat);
+        formData.append('longitude', lng);
+        formData.append('anonymous', anonymous ? 'true' : 'false');
+        formData.append('name', name);
+        formData.append('phone', phone);
+        formData.append('email', email);
+
+        if (attachedPhotoBlob) {
+          formData.append('photo', attachedPhotoBlob, 'photo.png');
+        }
+        if (attachedAudioBlob) {
+          formData.append('audio', attachedAudioBlob, 'audio.wav');
+        }
+
+        manualFiles.forEach(file => {
+          if (file.type.startsWith('image/')) {
+            formData.append('photo', file);
+          } else if (file.type.startsWith('video/')) {
+            formData.append('video', file);
+          } else if (file.type.startsWith('audio/')) {
+            formData.append('audio', file);
+          }
+        });
+
+        fetch((window.API_BASE || '') + '/api/complaints', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert('Submission error: ' + data.error);
+            nextBtn.innerText = 'Submit Complaint ✓';
+            nextBtn.disabled = false;
+          } else {
+            document.getElementById('form-container-box').style.display = 'none';
+            document.getElementById('receipt-container-box').style.display = 'block';
+
+            document.getElementById('receipt-ticket-id').innerText = data.id;
+            document.getElementById('receipt-date').innerText = data.date;
+            document.getElementById('receipt-title').innerText = title;
+            document.getElementById('receipt-dept').innerText = data.dept;
+            document.getElementById('receipt-eta').innerText = data.eta;
+            
+            document.getElementById('receipt-track-btn').onclick = () => {
+              location.href = `track.html?id=${data.id}`;
+            };
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Error connecting to backend server. Make sure the server is active!');
+          nextBtn.innerText = 'Submit Complaint ✓';
+          nextBtn.disabled = false;
+        });
+      }
+
+      function printReceipt() {
+        window.print();
+      }
+
+      function copyTicketID() {
+        const idVal = document.getElementById('receipt-ticket-id').innerText;
+        navigator.clipboard.writeText(idVal)
+          .then(() => {
+            const btn = document.querySelector('[onclick="copyTicketID()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ Copied';
+            btn.style.background = '#1f7a3f';
+            btn.style.color = '#fff';
+            setTimeout(() => {
+              btn.innerHTML = originalText;
+              btn.style.background = '#f0fdf4';
+              btn.style.color = '#1f7a3f';
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('Failed to copy text: ', err);
+            // Fallback alert
+            alert('Ticket ID copied: ' + idVal);
+          });
+      }
+    </script>
+  </body>
+</html>

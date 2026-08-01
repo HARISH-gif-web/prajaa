@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrajaMitra - Nodal Authority Administration Portal</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <style>
+      :root {
+        --primary: #1f7a3f;
+        --primary-dark: #166534;
+        --primary-light: #f0fdf4;
+        --dark: #0f172a;
+        --card-border: #e2e8f0;
+        --danger: #dc2626;
+        --warning: #d97706;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #f8fafc;
+        color: #0f172a;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+
+      /* Government Top Bar */
+      .gov-strip {
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 6px 24px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .gov-strip-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .gov-strip-left img {
+        height: 14px;
+        width: auto;
+      }
+
+      .gov-strip-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fbbf24;
+        font-size: 10px;
+        text-transform: uppercase;
+      }
+
+      /* Main Navigation Header */
+      .admin-navbar {
+        background: #ffffff;
+        border-bottom: 1px solid var(--card-border);
+        padding: 0 28px;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      }
+
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .nav-brand img {
+        height: 44px;
+        width: auto;
+      }
+
+      .brand-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--primary);
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+      }
+
+      .brand-subtitle {
+        font-size: 10px;
+        font-weight: 700;
+        color: #64748b;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .admin-badge-pill {
+        background: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-left: 12px;
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-box input {
+        padding: 8px 14px 8px 36px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        width: 240px;
+        transition: border-color 0.2s;
+      }
+
+      .search-box input:focus {
+        border-color: var(--primary);
+      }
+
+      /* Official Officer Profile Box with Gov Emblem */
+      .officer-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 14px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .officer-profile:hover {
+        background: #e2e8f0;
+      }
+
+      .gov-emblem-badge {
+        height: 30px;
+        width: auto;
+      }
+
+      .officer-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #16a34a;
+      }
+
+      .officer-info {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+      }
+
+      .officer-name {
+        font-size: 12px;
+        font-weight: 800;
+        color: #0f172a;
+      }
+
+      .officer-role {
+        font-size: 10px;
+        color: #16a34a;
+        font-weight: 700;
+      }
+
+      /* Main Dashboard Body */
+      .admin-layout {
+        display: flex;
+        flex: 1;
+        max-width: 1440px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 24px;
+        gap: 24px;
+      }
+
+      /* Sidebar Navigation */
+      .admin-sidebar {
+        width: 250px;
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        height: fit-content;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+      }
+
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .sidebar-item:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+
+      .sidebar-item.active {
+        background: #f0fdf4;
+        color: #16a34a;
+        font-weight: 800;
+      }
+
+      /* Content Area */
+      .admin-main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* Dept Banner Header */
+      .dept-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #166534 100%);
+        color: #ffffff;
+        border-radius: 20px;
+        padding: 28px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 10px 25px rgba(22, 163, 74, 0.15);
+      }
+
+      .dept-banner-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+
+      .dept-banner-subtitle {
+        font-size: 13px;
+        opacity: 0.9;
+      }
+
+      /* Emergency Alert Ticker */
+      .emergency-ticker {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #dc2626;
+        color: #991b1b;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.05);
+      }
+
+      /* Stats Overview Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+
+      @media (max-width: 1024px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .stat-card {
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      }
+
+      .stat-card-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-card-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+      }
+
+      .stat-card-badge {
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-block;
+        width: fit-content;
+        padding: 2px 8px;
+        border-radius: 6px;
+      }
+
+      .stat-card-badge.green { background: #f0fdf4; color: #16a34a; }
+      .stat-card-badge.amber { background: #fffbeb; color: #d97706; }
+      .stat-card-badge.red { background: #fef2f2; color: #dc2626; }
+      .stat-card-badge.purple { background: #faf5ff; color: #9333ea; }
+
+      /* Visual Analytics & Bar Structure Chart Section */
+      .analytics-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 900px) {
+        .analytics-section {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .chart-card {
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+      }
+
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .chart-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0f172a;
+      }
+
+      /* Bar Chart Component Styles */
+      .bar-chart-container {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        height: 180px;
+        padding-top: 20px;
+        border-bottom: 2px solid #e2e8f0;
+        gap: 12px;
+      }
+
+      .bar-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+
+      .bar-fill {
+        width: 100%;
+        max-width: 36px;
+        background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+        border-radius: 6px 6px 0 0;
+        transition: height 0.6s ease;
+        position: relative;
+        min-height: 4px;
+      }
+
+      .bar-fill.emergency {
+        background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+      }
+
+      .bar-fill.voice {
+        background: linear-gradient(180deg, #a855f7 0%, #7e22ce 100%);
+      }
+
+      .bar-val {
+        font-size: 11px;
+        font-weight: 800;
+        color: #0f172a;
+      }
+
+      .bar-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-align: center;
+        margin-top: 6px;
+      }
+
+      /* All Problems Table Panel */
+      .problems-card {
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+      }
+
+      .problems-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .filter-pills {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .filter-pill {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #f1f5f9;
+        color: #64748b;
+        cursor: pointer;
+        border: 1px solid #cbd5e1;
+        transition: all 0.2s;
+      }
+
+      .filter-pill:hover {
+        background: #e2e8f0;
+      }
+
+      .filter-pill.active {
+        background: #1f7a3f;
+        color: #ffffff;
+        border-color: #1f7a3f;
+      }
+
+      .filter-pill.red-active {
+        background: #dc2626;
+        color: #ffffff;
+        border-color: #dc2626;
+      }
+
+      .filter-pill.purple-active {
+        background: #9333ea;
+        color: #ffffff;
+        border-color: #9333ea;
+      }
+
+      /* Table Styles */
+      .table-container {
+        overflow-x: auto;
+      }
+
+      .problems-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 13px;
+      }
+
+      .problems-table th {
+        background: #f8fafc;
+        padding: 12px 16px;
+        font-weight: 700;
+        color: #475569;
+        border-bottom: 1px solid #e2e8f0;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+      }
+
+      .problems-table td {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+      }
+
+      .problems-table tr {
+        transition: background 0.15s;
+      }
+
+      .problems-table tr:hover {
+        background: #f8fafc;
+      }
+
+      .problems-table tr.emergency-row {
+        background: #fff5f5;
+      }
+
+      .problems-table tr.voice-row {
+        background: #faf5ff;
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+      }
+
+      .status-badge.review { background: #e0e7ff; color: #4338ca; }
+      .status-badge.investigation { background: #fffbeb; color: #b45309; }
+      .status-badge.resolved { background: #f0fdf4; color: #15803d; }
+      .status-badge.emergency { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+      .status-badge.voice { background: #faf5ff; color: #9333ea; border: 1px solid #e9d5ff; }
+
+      .action-btn {
+        background: #16a34a;
+        color: #ffffff;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .action-btn:hover {
+        background: #15803d;
+      }
+
+      .status-select {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-size: 12px;
+        font-weight: 700;
+        outline: none;
+        background: #ffffff;
+        cursor: pointer;
+      }
+
+      /* Modal Styling */
+      .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-box {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 32px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+      }
+
+      .form-control:focus {
+        border-color: #16a34a;
+      }
+
+      .passkey-error-box {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Government Strip -->
+    <div class="gov-strip">
+      <div class="gov-strip-left">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg" alt="India Flag" />
+        <span>Government of India &bull; Ministry of Electronics &amp; IT &bull; PrajaMitra Platform</span>
+      </div>
+      <div class="gov-strip-right">
+        <span>🛡️ Official Authority Administration Portal</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="admin-navbar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a href="index.html" class="nav-brand">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="State Emblem of India" />
+          <div>
+            <div class="brand-title">PrajaMitra</div>
+            <div class="brand-subtitle">Authority Administration</div>
+          </div>
+        </a>
+        <span class="admin-badge-pill" id="nav-dept-badge">General Authority</span>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Live Search Box -->
+        <div class="search-box">
+          <span style="position: absolute; left: 10px; color: #94a3b8; font-size: 13px;">🔍</span>
+          <input type="text" id="admin-search-input" placeholder="Search ID, Topic, Emergency..." oninput="handleAdminSearch()" />
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Admin Layout -->
+    <div class="admin-layout" style="display: block; max-width: 1440px; margin: 0 auto; width: 100%; padding: 24px;">
+      <!-- Main Content Area -->
+      <main class="admin-main-content" style="width: 100%;">
+        <!-- All Problems & Complaints Table -->
+        <div class="problems-card" id="problems-section">
+          <!-- Category Division Bar for Authority Portal -->
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 14px 18px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: space-between;">
+              <span>🏛️ Filter By Department Category:</span>
+              <span style="font-size: 11px; color: #16a34a; font-weight: 700;">🟢 Live Real-Time Feed Active</span>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="dept-category-tabs">
+              <button type="button" class="filter-pill active" onclick="switchCategoryDept('all', this)" style="padding: 8px 16px; font-size: 13px;">🌐 All Departments</button>
+              <button type="button" class="filter-pill" onclick="switchCategoryDept('food', this)" style="padding: 8px 16px; font-size: 13px;">🍎 Food Dept</button>
+              <button type="button" class="filter-pill" onclick="switchCategoryDept('education', this)" style="padding: 8px 16px; font-size: 13px;">📚 Education Dept</button>
+              <button type="button" class="filter-pill" onclick="switchCategoryDept('health', this)" style="padding: 8px 16px; font-size: 13px;">🏥 Health Dept</button>
+              <button type="button" class="filter-pill" onclick="switchCategoryDept('civic', this)" style="padding: 8px 16px; font-size: 13px;">🚧 Civic Infrastructure</button>
+              <button type="button" class="filter-pill" onclick="switchCategoryDept('others', this)" style="padding: 8px 16px; font-size: 13px;">🏢 Others</button>
+            </div>
+          </div>
+
+          <div class="problems-header">
+            <div>
+              <h3 style="font-size: 18px; font-weight: 800; color: #0f172a;">Departmental Problems &amp; Grievances</h3>
+              <p style="font-size: 12px; color: #64748b; margin-top: 2px;">Note: Emergency and Voice Grievances are highlighted and automatically placed at the <strong>starting of the list</strong>.</p>
+            </div>
+            <div class="filter-pills">
+              <button class="filter-pill active" id="btn-filter-all" onclick="filterByStatus('all', this)">📋 Registered Grievances</button>
+              <button class="filter-pill" id="btn-filter-emg" onclick="filterByStatus('emergency', this)">🚨 Emergency Priority</button>
+              <button class="filter-pill" id="btn-filter-voice" onclick="filterByStatus('voice', this)">🎙️ Voice Grievances</button>
+              <button class="filter-pill" id="btn-filter-review" onclick="filterByStatus('review', this)">Under Review</button>
+              <button class="filter-pill" id="btn-filter-inv" onclick="filterByStatus('investigation', this)">⚙️ Under Investigation</button>
+              <button class="filter-pill" id="btn-filter-res" onclick="filterByStatus('resolved', this)">✅ Resolved</button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="problems-table">
+              <thead>
+                <tr>
+                  <th>Grievance ID &amp; Date</th>
+                  <th>Grievance Topic &amp; Audio</th>
+                  <th>Department / Category</th>
+                  <th>Location</th>
+                  <th>Current Status</th>
+                  <th>Update Status &amp; Solve</th>
+                </tr>
+              </thead>
+              <tbody id="admin-problems-table-body">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: #94a3b8; padding: 30px;">Loading departmental problems...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Login / Key Switch Modal -->
+    <div id="login-modal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 800;">🏛️ Authority Department Login</h3>
+          <button type="button" onclick="closeLoginModal()" style="border: none; background: none; font-size: 24px; cursor: pointer;">×</button>
+        </div>
+        
+        <div id="modal-error-box" class="passkey-error-box"></div>
+
+        <form onsubmit="handleModalLogin(event)">
+          <div class="form-group">
+            <label>Official Email Address</label>
+            <input type="email" id="modal-email" class="form-control" placeholder="officer@gov.in" required />
+          </div>
+          <div class="form-group">
+            <label>Select Department</label>
+            <select id="modal-dept" class="form-control" required style="background: #fff;" onchange="clearPasskeyError()">
+              <option value="food">Food Department (Pass key: 9676292195)</option>
+              <option value="education">Education Department (Pass key: 6301316591)</option>
+              <option value="health">Health Department (Pass key: 8886803818)</option>
+              <option value="civic">Civic Infrastructure (Pass key: 7671000584)</option>
+              <option value="others">Others (Pass key: 7671000583)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Department Secret Pass Key</label>
+            <input type="password" id="modal-passkey" class="form-control" placeholder="Enter secret key for selected department" required oninput="clearPasskeyError()" />
+          </div>
+          <button type="submit" class="action-btn" style="width: 100%; padding: 14px; font-size: 14px; margin-top: 10px;">
+            Verify Secret Key &amp; Access Dashboard
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Quick Resolve Modal -->
+    <div id="resolve-modal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 800;">✅ Solve &amp; Resolve Grievance</h3>
+          <button type="button" onclick="closeResolveModal()" style="border: none; background: none; font-size: 24px; cursor: pointer;">×</button>
+        </div>
+        <form onsubmit="handleResolveSubmit(event)">
+          <input type="hidden" id="resolve-complaint-id" />
+          <div style="margin-bottom: 12px; font-size: 13px; font-weight: 700; color: #1e293b;" id="resolve-title-label"></div>
+          <div class="form-group">
+            <label>Resolution Action &amp; Official Remarks</label>
+            <textarea id="resolve-remarks" class="form-control" rows="4" placeholder="Describe the on-ground resolution steps taken by the department..." required></textarea>
+          </div>
+          <button type="submit" class="action-btn" style="width: 100%; padding: 12px; font-size: 14px;">
+            Mark as Resolved &amp; Update Citizen Interface
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Client Script -->
+    <script>
+      let ALL_COMPLAINTS = [];
+      let RAW_FETCHED_COMPLAINTS = [];
+      let CURRENT_FILTER = 'all';
+      let SELECTED_CATEGORY_DEPT = 'all';
+
+      const DEPARTMENT_KEYS = {
+        food: '9676292195',
+        education: '6301316591',
+        health: '8886803818',
+        civic: '7671000584',
+        others: '7671000583'
+      };
+
+      const DEPARTMENT_NAMES = {
+        food: 'Food Department',
+        education: 'Education Department',
+        health: 'Health Department',
+        civic: 'Civic Infrastructure',
+        others: 'General Authority'
+      };
+
+      window.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('prajamitra_token');
+        if (!token) {
+          openLoginModal();
+        } else {
+          loadAdminData();
+          // Real-time live polling interface
+          setInterval(loadAdminData, 5000);
+        }
+      });
+
+      function openLoginModal() {
+        clearPasskeyError();
+        document.getElementById('login-modal').classList.add('active');
+      }
+
+      function closeLoginModal() {
+        document.getElementById('login-modal').classList.remove('active');
+      }
+
+      function clearPasskeyError() {
+        const box = document.getElementById('modal-error-box');
+        if (box) {
+          box.style.display = 'none';
+          box.innerText = '';
+        }
+      }
+
+      function showPasskeyError(msg) {
+        const box = document.getElementById('modal-error-box');
+        if (box) {
+          box.innerText = msg;
+          box.style.display = 'block';
+        }
+      }
+
+      function openResolveModal(id, title) {
+        document.getElementById('resolve-complaint-id').value = id;
+        document.getElementById('resolve-title-label').innerText = `Grievance #${id}: ${title || ''}`;
+        document.getElementById('resolve-modal').classList.add('active');
+      }
+
+      function closeResolveModal() {
+        document.getElementById('resolve-modal').classList.remove('active');
+      }
+
+      function handleModalLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('modal-email').value.trim();
+        const department = document.getElementById('modal-dept').value;
+        const passcode = document.getElementById('modal-passkey').value.trim();
+
+        // Check passkey match for selected department
+        const expectedKey = DEPARTMENT_KEYS[department];
+        
+        // Find if passcode matches a different department
+        const wrongDeptMatch = Object.keys(DEPARTMENT_KEYS).find(k => DEPARTMENT_KEYS[k] === passcode);
+
+        if (passcode !== expectedKey) {
+          if (wrongDeptMatch && wrongDeptMatch !== department) {
+            const wrongDeptName = DEPARTMENT_NAMES[wrongDeptMatch];
+            const targetDeptName = DEPARTMENT_NAMES[department];
+            showPasskeyError(`❌ Incorrect passkey entered for ${targetDeptName}!\n\nThe passkey you typed (${passcode}) belongs to ${wrongDeptName}. Please select ${wrongDeptName} or enter the correct key for ${targetDeptName} (${expectedKey}).`);
+          } else {
+            showPasskeyError(`❌ Incorrect passkey for ${DEPARTMENT_NAMES[department]}!\n\nPlease enter the correct secret passkey (${expectedKey}).`);
+          }
+          return;
+        }
+
+        fetch('/api/auth/authority', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, department, passcode })
+        })
+        .then(async res => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Invalid credentials');
+          return data;
+        })
+        .then(data => {
+          localStorage.setItem('prajamitra_token', data.token);
+          localStorage.setItem('prajamitra_user_email', data.email);
+          localStorage.setItem('prajamitra_is_authority', 'true');
+          localStorage.setItem('prajamitra_authority_dept', department);
+
+          closeLoginModal();
+          alert(`Pass key verified! Logged into ${DEPARTMENT_NAMES[department]} Portal.`);
+          loadAdminData();
+        })
+        .catch(err => {
+          showPasskeyError(err.message || 'Incorrect credentials or passkey!');
+        });
+      }
+
+      function loadAdminData() {
+        const token = localStorage.getItem('prajamitra_token');
+        const authDept = localStorage.getItem('prajamitra_authority_dept') || 'all';
+
+        const deptLabel = DEPARTMENT_NAMES[authDept] || 'Nodal Authority';
+
+        document.getElementById('nav-dept-badge').innerText = deptLabel;
+        document.getElementById('banner-dept-title').innerText = `${deptLabel} Portal`;
+        document.getElementById('officer-display-dept').innerText = deptLabel;
+
+        // Fetch all complaints
+        fetch('/api/complaints/user-history?all=true', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+          ALL_COMPLAINTS = filterByDept(data, authDept);
+          // Sort complaints so Emergency and Voice grievances appear at the VERY START
+          ALL_COMPLAINTS.sort((a, b) => {
+            const aEmg = a.is_emergency || (a.severity && a.severity.toLowerCase() === 'emergency') || (a.title && a.title.includes('EMERGENCY'));
+            const bEmg = b.is_emergency || (b.severity && b.severity.toLowerCase() === 'emergency') || (b.title && b.title.includes('EMERGENCY'));
+            if (aEmg && !bEmg) return -1;
+            if (!aEmg && bEmg) return 1;
+
+            const aVoice = a.is_voice || (a.media && a.media.audio) || (a.title && a.title.includes('VOICE'));
+            const bVoice = b.is_voice || (b.media && b.media.audio) || (b.title && b.title.includes('VOICE'));
+            if (aVoice && !bVoice) return -1;
+            if (!aVoice && bVoice) return 1;
+
+            return 0;
+          });
+
+          renderDashboardMetrics(ALL_COMPLAINTS);
+          renderProblemsTable(ALL_COMPLAINTS);
+        })
+        .catch(err => console.error('Error fetching admin complaints:', err));
+      }
+
+      function filterByDept(complaints, deptKey) {
+        if (!deptKey || deptKey === 'all' || deptKey === 'super admin' || deptKey === 'system') return complaints;
+        return complaints.filter(c => {
+          const text = ((c.category || '') + ' ' + (c.dept || '') + ' ' + (c.subcategory || '') + ' ' + (c.title || '') + ' ' + (c.description || '')).toLowerCase();
+          if (deptKey === 'food') return text.includes('food') || text.includes('civil supplies') || text.includes('ration') || text.includes('canteen') || text.includes('meal') || text.includes('pds');
+          if (deptKey === 'education') return text.includes('education') || text.includes('school') || text.includes('college') || text.includes('scholarship') || text.includes('teacher');
+          if (deptKey === 'health') return text.includes('health') || text.includes('hospital') || text.includes('doctor') || text.includes('medical') || text.includes('sanitation') || text.includes('clinic');
+          if (deptKey === 'civic') return text.includes('civic') || text.includes('municipal') || text.includes('road') || text.includes('pothole') || text.includes('street') || text.includes('water') || text.includes('drainage') || text.includes('pwd');
+          if (deptKey === 'others') return text.includes('other') || (!text.includes('food') && !text.includes('education') && !text.includes('health') && !text.includes('road') && !text.includes('water'));
+          return true;
+        });
+      }
+
+      function renderDashboardMetrics(complaints) {
+        const total = complaints.length;
+        let invest = 0;
+        let resolved = 0;
+        let emergencyCount = 0;
+        let voiceCount = 0;
+
+        complaints.forEach(c => {
+          const s = (c.status || '').toLowerCase();
+          if (s.includes('resolved')) resolved++;
+          else if (s.includes('investigation') || s.includes('assigned')) invest++;
+
+          if (c.is_emergency || (c.severity && c.severity.toLowerCase() === 'emergency') || (c.title && c.title.includes('EMERGENCY'))) {
+            emergencyCount++;
+          }
+          if (c.is_voice || (c.media && c.media.audio) || (c.title && c.title.includes('VOICE'))) {
+            voiceCount++;
+          }
+        });
+
+        if (document.getElementById('stat-total')) document.getElementById('stat-total').innerText = total;
+        if (document.getElementById('stat-emergency')) document.getElementById('stat-emergency').innerText = emergencyCount;
+        if (document.getElementById('stat-voice')) document.getElementById('stat-voice').innerText = voiceCount;
+        if (document.getElementById('stat-investigation')) document.getElementById('stat-investigation').innerText = invest;
+        if (document.getElementById('stat-resolved')) document.getElementById('stat-resolved').innerText = resolved;
+
+        const rate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+        if (document.getElementById('stat-rate-badge')) document.getElementById('stat-rate-badge').innerText = `${rate}% Resolution Rate`;
+
+        // Render Bar Structure Chart & Donut
+        renderBarStructureChart(complaints);
+        renderDonutSVG({ 'Under Review': total - invest - resolved, 'In Progress': invest, 'Resolved': resolved }, total);
+      }
+
+      function renderBarStructureChart(complaints) {
+        const container = document.getElementById('bar-chart-container');
+        if (!container) return;
+
+        let foodCount = 0, civicCount = 0, eduCount = 0, healthCount = 0, emgCount = 0, voiceCount = 0;
+
+        complaints.forEach(c => {
+          const cat = (c.category || '').toLowerCase();
+          if (cat.includes('food')) foodCount++;
+          else if (cat.includes('civic')) civicCount++;
+          else if (cat.includes('edu')) eduCount++;
+          else if (cat.includes('health')) healthCount++;
+
+          if (c.is_emergency || (c.title && c.title.includes('EMERGENCY'))) emgCount++;
+          if (c.is_voice || (c.title && c.title.includes('VOICE'))) voiceCount++;
+        });
+
+        const maxVal = Math.max(foodCount, civicCount, eduCount, healthCount, emgCount, voiceCount, 5);
+
+        const bars = [
+          { label: 'Food', count: foodCount, type: 'normal' },
+          { label: 'Civic', count: civicCount, type: 'normal' },
+          { label: 'Edu', count: eduCount, type: 'normal' },
+          { label: 'Health', count: healthCount, type: 'normal' },
+          { label: '🚨 Emergency', count: emgCount, type: 'emergency' },
+          { label: '🎙️ Voice', count: voiceCount, type: 'voice' }
+        ];
+
+        container.innerHTML = bars.map(b => {
+          const pct = Math.max(Math.round((b.count / maxVal) * 100), 10);
+          return `
+            <div class="bar-column">
+              <span class="bar-val">${b.count}</span>
+              <div class="bar-fill ${b.type}" style="height: ${pct}%;"></div>
+              <span class="bar-label">${b.label}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderDonutSVG(dist, total) {
+        const container = document.getElementById('donut-chart-container');
+        if (!container) return;
+
+        if (total === 0) {
+          container.innerHTML = `<p style="font-size: 12px; color: #94a3b8;">No data available</p>`;
+          return;
+        }
+
+        const resPct = Math.round(((dist['Resolved'] || 0) / total) * 100);
+        const invPct = Math.round(((dist['In Progress'] || 0) / total) * 100);
+
+        container.innerHTML = `
+          <svg width="130" height="130" viewBox="0 0 36 36">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e2e8f0" stroke-width="4"/>
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#16a34a" stroke-width="4" stroke-dasharray="${resPct}, 100"/>
+            <text x="18" y="20.5" font-size="8" font-weight="bold" text-anchor="middle" fill="#0f172a">${resPct}%</text>
+          </svg>
+          <div style="font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #16a34a;"></span> Resolved: ${dist['Resolved'] || 0}</div>
+            <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #d97706;"></span> In Progress: ${dist['In Progress'] || 0}</div>
+            <div style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #4338ca;"></span> Under Review: ${dist['Under Review'] || 0}</div>
+          </div>
+        `;
+      }
+
+      function switchCategoryDept(deptKey, btn) {
+        SELECTED_CATEGORY_DEPT = deptKey;
+        if (btn) {
+          document.querySelectorAll('#dept-category-tabs .filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        }
+        renderProblemsTable(ALL_COMPLAINTS);
+      }
+
+      function renderProblemsTable(complaints) {
+        const tbody = document.getElementById('admin-problems-table-body');
+        if (!tbody) return;
+
+        let filtered = complaints;
+
+        // Apply Category Division Filter
+        if (SELECTED_CATEGORY_DEPT && SELECTED_CATEGORY_DEPT !== 'all') {
+          filtered = filterByDept(filtered, SELECTED_CATEGORY_DEPT);
+        }
+
+        // Apply Status Filter
+        if (CURRENT_FILTER === 'emergency') {
+          filtered = filtered.filter(c => c.is_emergency || (c.severity && c.severity.toLowerCase() === 'emergency') || (c.title && c.title.includes('EMERGENCY')));
+        } else if (CURRENT_FILTER === 'voice') {
+          filtered = filtered.filter(c => c.is_voice || (c.media && c.media.audio) || (c.title && c.title.includes('VOICE')));
+        } else if (CURRENT_FILTER === 'review') {
+          filtered = filtered.filter(c => c.status.includes('Review') || c.status.includes('Submitted'));
+        } else if (CURRENT_FILTER === 'investigation') {
+          filtered = filtered.filter(c => c.status.includes('Investigation') || c.status.includes('Assigned'));
+        } else if (CURRENT_FILTER === 'resolved') {
+          filtered = filtered.filter(c => c.status.includes('Resolved'));
+        }
+
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 30px;">No problems matching current criteria.</td></tr>`;
+          return;
+        }
+
+        filtered.forEach(c => {
+          const isEmg = c.is_emergency || (c.severity && c.severity.toLowerCase() === 'emergency') || (c.title && c.title.includes('EMERGENCY'));
+          const isVoice = c.is_voice || (c.media && c.media.audio) || (c.title && c.title.includes('VOICE'));
+
+          let rowClass = '';
+          if (isEmg) rowClass = 'emergency-row';
+          else if (isVoice) rowClass = 'voice-row';
+
+          let statusBadgeHTML = `<span class="status-badge review">Under Review</span>`;
+          if (c.status.includes('Investigation') || c.status.includes('Assigned')) {
+            statusBadgeHTML = `<span class="status-badge investigation">In Progress</span>`;
+          } else if (c.status.includes('Resolved')) {
+            statusBadgeHTML = `<span class="status-badge resolved">Resolved</span>`;
+          }
+
+          let typeBadges = '';
+          if (isEmg) {
+            typeBadges += `<span class="status-badge emergency" style="margin-right:4px;">🚨 CRITICAL EMERGENCY</span>`;
+          }
+          if (isVoice) {
+            typeBadges += `<span class="status-badge voice">🎙️ VOICE RECORDED</span>`;
+          }
+
+          let audioPlayer = '';
+          if (isVoice) {
+            const audioUrl = (c.media && c.media.audio) || c.voice_url || 'https://actions.google.com/sounds/v1/human/speech_count.ogg';
+            audioPlayer = `
+              <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
+                <audio controls src="${audioUrl}" style="height: 28px; max-width: 200px;"></audio>
+                <span style="font-size: 10px; font-weight: 700; color: #7e22ce;">Voice Note</span>
+              </div>
+            `;
+          }
+
+          const tr = document.createElement('tr');
+          tr.className = rowClass;
+          tr.innerHTML = `
+            <td>
+              <strong style="color: #0f172a; font-size: 13px;">${c.id}</strong><br/>
+              <span style="font-size: 11px; color: #64748b;">${c.date || '31 Jul 2026'}</span>
+            </td>
+            <td>
+              <div style="margin-bottom: 4px;">${typeBadges}</div>
+              <div style="font-weight: 800; color: #0f172a; font-size: 13px;">${c.title}</div>
+              <div style="font-size: 11px; color: #475569; margin-top: 2px;">${(c.description || '').substring(0, 70)}...</div>
+              ${audioPlayer}
+            </td>
+            <td><span style="font-weight: 700; color: #334155; text-transform: capitalize;">${c.category || 'General'}</span></td>
+            <td><span style="font-size: 12px; color: #64748b;">📍 ${c.location && c.location.latitude ? 'GPS Tracked Location' : (c.location || 'State Wide')}</span></td>
+            <td>${statusBadgeHTML}</td>
+            <td>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <select class="status-select" onchange="updateStatus('${c.id}', this.value)">
+                  <option value="Submitted (Under Review)" ${c.status.includes('Review') || c.status.includes('Submitted') ? 'selected' : ''}>Under Review</option>
+                  <option value="Under Investigation" ${c.status.includes('Investigation') ? 'selected' : ''}>In Progress</option>
+                  <option value="Resolved" ${c.status.includes('Resolved') ? 'selected' : ''}>Resolved</option>
+                </select>
+                <button class="action-btn" onclick="openResolveModal('${c.id}', '${c.title.replace(/'/g, "\\'")}')">Solve</button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function updateStatus(id, newStatus) {
+        const token = localStorage.getItem('prajamitra_token');
+        fetch('/api/complaints/status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ complaint_id: id, status: newStatus, remarks: `Status updated to ${newStatus} by Authority Officer` })
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(`Status for ${id} successfully updated to: ${newStatus}`);
+          loadAdminData();
+        })
+        .catch(err => alert('Failed to update status'));
+      }
+
+      function handleResolveSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById('resolve-complaint-id').value;
+        const remarks = document.getElementById('resolve-remarks').value.trim();
+        const token = localStorage.getItem('prajamitra_token');
+
+        fetch('/api/complaints/status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ complaint_id: id, status: 'Resolved', remarks })
+        })
+        .then(res => res.json())
+        .then(data => {
+          closeResolveModal();
+          alert(`Grievance #${id} successfully marked as RESOLVED and updated live on user portal!`);
+          loadAdminData();
+        })
+        .catch(err => alert('Failed to mark as resolved'));
+      }
+
+      function filterByStatus(status, btn) {
+        CURRENT_FILTER = status;
+        document.querySelectorAll('.filter-pills .filter-pill').forEach(b => {
+          b.classList.remove('active', 'red-active', 'purple-active');
+        });
+
+        let targetBtn = btn;
+        if (!targetBtn) {
+          if (status === 'all') targetBtn = document.getElementById('btn-filter-all');
+          else if (status === 'emergency') targetBtn = document.getElementById('btn-filter-emg');
+          else if (status === 'voice') targetBtn = document.getElementById('btn-filter-voice');
+          else if (status === 'review') targetBtn = document.getElementById('btn-filter-review');
+          else if (status === 'investigation') targetBtn = document.getElementById('btn-filter-inv');
+          else if (status === 'resolved') targetBtn = document.getElementById('btn-filter-res');
+        }
+
+        if (targetBtn) {
+          if (status === 'emergency') targetBtn.classList.add('red-active');
+          else if (status === 'voice') targetBtn.classList.add('purple-active');
+          else targetBtn.classList.add('active');
+        }
+
+        renderProblemsTable(ALL_COMPLAINTS);
+
+        const tableSec = document.getElementById('problems-section');
+        if (tableSec) {
+          tableSec.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      function handleAdminSearch() {
+        const q = document.getElementById('admin-search-input').value.toLowerCase();
+        const filtered = ALL_COMPLAINTS.filter(c => {
+          return c.id.toLowerCase().includes(q) ||
+                 (c.title || '').toLowerCase().includes(q) ||
+                 (c.description || '').toLowerCase().includes(q) ||
+                 (c.category || '').toLowerCase().includes(q);
+        });
+        renderProblemsTable(filtered);
+      }
+
+      function switchTab(tab) {
+        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+        if (tab === 'emergency') {
+          document.getElementById('side-emergency').classList.add('active');
+          filterByStatus('emergency', document.getElementById('btn-filter-emg'));
+          document.getElementById('problems-section').scrollIntoView({ behavior: 'smooth' });
+        } else if (tab === 'problems') {
+          document.getElementById('side-problems').classList.add('active');
+          filterByStatus('all', document.querySelector('.filter-pill'));
+          document.getElementById('problems-section').scrollIntoView({ behavior: 'smooth' });
+        } else if (tab === 'analytics') {
+          document.getElementById('side-analytics').classList.add('active');
+          document.getElementById('analytics-section').scrollIntoView({ behavior: 'smooth' });
+        } else {
+          document.getElementById('side-dashboard').classList.add('active');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+
+      function exportCSVReport() {
+        if (!ALL_COMPLAINTS || ALL_COMPLAINTS.length === 0) {
+          alert('No complaints to export.');
+          return;
+        }
+
+        let csv = 'Grievance ID,Title,Category,Status,Date,Severity\n';
+        ALL_COMPLAINTS.forEach(c => {
+          const cleanTitle = (c.title || '').replace(/,/g, ' ');
+          csv += `"${c.id}","${cleanTitle}","${c.category}","${c.status}","${c.date}","${c.severity || 'Normal'}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `PrajaMitra_Authority_Report_${Date.now()}.csv`;
+        a.click();
+      }
+    </script>
+  </body>
+</html>

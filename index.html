@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrajaMitra - National Grievance Portal</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <style>
+      :root {
+        --primary: #1f7a3f;
+        --primary-dark: #166534;
+        --dark: #0f172a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f1f5f9 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
+      }
+
+      .gateway-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        max-width: 900px;
+        width: 90%;
+        padding: 40px 20px;
+        z-index: 10;
+      }
+
+      .splash-logo {
+        height: 100px;
+        width: auto;
+        margin-bottom: 16px;
+        filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.08));
+        animation: logo-glow 1.5s forwards ease-out;
+      }
+
+      .splash-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 42px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -1px;
+        margin: 0;
+        background: linear-gradient(to right, #0f172a, #1f7a3f);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .splash-tagline {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 6px;
+        margin-bottom: 36px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      /* Login Gateway Cards */
+      .login-options {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        width: 100%;
+        max-width: 760px;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fade-up 0.8s 0.6s forwards ease-out;
+      }
+
+      @media (max-width: 640px) {
+        .login-options {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .gateway-card {
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 32px 24px;
+        text-align: left;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+      }
+
+      .gateway-card:hover {
+        border-color: #1f7a3f;
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(31, 122, 63, 0.12);
+      }
+
+      .gateway-card.authority-card:hover {
+        border-color: #16a34a;
+        box-shadow: 0 12px 30px rgba(22, 163, 74, 0.15);
+      }
+
+      .card-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 16px;
+      }
+
+      .card-badge.citizen {
+        background: #eff6ff;
+        color: #2563eb;
+      }
+
+      .card-badge.authority {
+        background: #f0fdf4;
+        color: #16a34a;
+      }
+
+      .card-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 22px;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 8px 0;
+      }
+
+      .card-desc {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.5;
+        margin-bottom: 24px;
+      }
+
+      .card-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        width: 100%;
+      }
+
+      .card-btn.citizen-btn {
+        background: #1f7a3f;
+        color: #ffffff;
+      }
+
+      .card-btn.citizen-btn:hover {
+        background: #166534;
+      }
+
+      .card-btn.authority-btn {
+        background: #16a34a;
+        color: #ffffff;
+      }
+
+      .card-btn.authority-btn:hover {
+        background: #15803d;
+      }
+
+      /* Modal Overlay */
+      .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+      }
+
+      .modal-overlay.active .modal-card {
+        transform: scale(1);
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+
+      .form-control:focus {
+        border-color: #16a34a;
+      }
+
+      .gov-footer {
+        position: absolute;
+        bottom: 24px;
+        font-size: 11px;
+        color: #64748b;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+      }
+
+      @keyframes logo-glow {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      @keyframes fade-up {
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Initial Opening Flag & Emblem Splash Animation */
+      #initial-portal-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background-color: #030712;
+        background-image: 
+          radial-gradient(circle at 50% 50%, rgba(255, 153, 51, 0.15) 0%, rgba(19, 136, 8, 0.12) 40%, rgba(3, 7, 18, 0.98) 85%),
+          radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+          radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 90px 40px, rgba(255,153,51,0.9), rgba(0,0,0,0)),
+          radial-gradient(1.5px 1.5px at 130px 80px, rgba(255,255,255,0.7), rgba(0,0,0,0)),
+          radial-gradient(1px 1px at 160px 120px, rgba(19,136,8,0.8), rgba(0,0,0,0));
+        background-size: 100% 100%, 200px 200px, 250px 250px, 300px 300px, 180px 180px, 220px 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #ffffff;
+        opacity: 1;
+        transition: opacity 0.6s ease-in-out;
+      }
+
+      @keyframes flagWaveRibbon {
+        0% { transform: translate(-10%, -5%) rotate(-5deg) scale(1); }
+        50% { transform: translate(10%, 5%) rotate(5deg) scale(1.08); }
+        100% { transform: translate(-10%, -5%) rotate(-5deg) scale(1); }
+      }
+
+      @keyframes emblemFloat {
+        0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5)); }
+        50% { transform: translateY(-8px) scale(1.05); filter: drop-shadow(0 0 25px rgba(255, 153, 51, 0.8)); }
+      }
+
+      @keyframes ringSwirl {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @keyframes dotsAnim {
+        0% { content: '.'; }
+        33% { content: '..'; }
+        66% { content: '...'; }
+      }
+
+      .splash-flag-ribbon {
+        position: absolute;
+        width: 140%;
+        height: 180px;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 153, 51, 0.45) 0%,
+          rgba(255, 255, 255, 0.35) 50%,
+          rgba(19, 136, 8, 0.45) 100%
+        );
+        filter: blur(25px);
+        animation: flagWaveRibbon 6s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      .splash-emblem-wrapper {
+        position: relative;
+        width: 220px;
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        z-index: 2;
+      }
+
+      .splash-tricolor-ring {
+        position: absolute;
+        inset: -12px;
+        border-radius: 50%;
+        padding: 5px;
+        background: conic-gradient(
+          from 0deg,
+          #FF9933 0deg 120deg,
+          #FFFFFF 120deg 240deg,
+          #138808 240deg 360deg
+        );
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        animation: ringSwirl 4s linear infinite;
+        filter: drop-shadow(0 0 20px rgba(255, 153, 51, 0.7)) drop-shadow(0 0 20px rgba(19, 136, 8, 0.7));
+      }
+
+      .splash-emblem-img {
+        width: 135px;
+        height: 135px;
+        object-fit: contain;
+        animation: emblemFloat 3s ease-in-out infinite;
+        z-index: 3;
+      }
+
+      .splash-text-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: #ffffff;
+        margin: 0 0 8px 0;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        z-index: 2;
+      }
+
+      .splash-text-sub {
+        font-size: 14px;
+        font-weight: 600;
+        color: #cbd5e1;
+        letter-spacing: 1px;
+        z-index: 2;
+      }
+
+      .splash-text-sub::after {
+        display: inline-block;
+        content: '...';
+        animation: dotsAnim 1.5s steps(4, jump-none) infinite;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <!-- INITIAL STARTING STAGE SPLASH SCREEN -->
+    <div id="initial-portal-splash">
+      <div class="splash-flag-ribbon"></div>
+      <div class="splash-emblem-wrapper">
+        <div class="splash-tricolor-ring"></div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" class="splash-emblem-img" alt="State Emblem of India" />
+      </div>
+      <div class="splash-text-title">PrajaMitra Portal</div>
+      <div class="splash-text-sub">Initializing National Security System</div>
+    </div>
+    
+    <div class="gateway-container">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" class="splash-logo" alt="Emblem of India Logo" />
+      <h1 class="splash-title">PrajaMitra</h1>
+      <div class="splash-tagline">National Grievance Redressal Portal</div>
+
+      <div class="login-options">
+        <!-- Normal Citizen Login Option -->
+        <div class="gateway-card" onclick="location.href='main.html';">
+          <div>
+            <span class="card-badge citizen">👤 Public Access</span>
+            <h2 class="card-title">Citizen Portal</h2>
+            <p class="card-desc">Lodge public grievances, track investigation updates, and view resolution progress in real time.</p>
+          </div>
+          <a href="main.html" onclick="event.stopPropagation();" class="card-btn citizen-btn">
+            Enter Citizen Portal &rsaquo;
+          </a>
+        </div>
+
+        <!-- Authority Admin Login Option -->
+        <div class="gateway-card authority-card" onclick="openAuthorityLoginModal()">
+          <div>
+            <span class="card-badge authority">🏛️ Nodal Officer Portal</span>
+            <h2 class="card-title">Authority Login</h2>
+            <p class="card-desc">Departmental authority login for food, education, health, civic infrastructure, and other officers.</p>
+          </div>
+          <button type="button" class="card-btn authority-btn" onclick="openAuthorityLoginModal(); event.stopPropagation();">
+            Authority Login &rsaquo;
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authority Login Modal -->
+    <div id="authority-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+          <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #0f172a;">🏛️ Authority Admin Login</h3>
+          <button type="button" onclick="closeAuthorityLoginModal()" style="border: none; background: none; font-size: 24px; cursor: pointer; color: #64748b; line-height: 1;">×</button>
+        </div>
+
+        <form onsubmit="handleAuthorityLogin(event)">
+          <div class="form-group">
+            <label>Gmail / Email Address <span style="color: #dc2626;">*</span></label>
+            <input type="email" id="gateway-email" class="form-control" placeholder="officer@gmail.com" required />
+          </div>
+
+          <div class="form-group">
+            <label>Department <span style="color: #dc2626;">*</span></label>
+            <select id="gateway-dept" class="form-control" required style="background: #fff;">
+              <option value="food">Food Department</option>
+              <option value="education">Education Department</option>
+              <option value="health">Health Department</option>
+              <option value="civic">Civic Infrastructure</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Department Pass Key <span style="color: #dc2626;">*</span></label>
+            <input type="password" id="gateway-passkey" class="form-control" placeholder="Enter secret pass key" required />
+          </div>
+
+          <button type="submit" class="card-btn authority-btn" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 15px;">
+            Verify &amp; Access Authority Portal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="gov-footer">
+      MINISTRY OF ELECTRONICS &amp; INFORMATION TECHNOLOGY &bull; GOVERNMENT OF INDIA
+    </div>
+
+    <script src="accessibility.js"></script>
+    <script>
+      function openAuthorityLoginModal() {
+        document.getElementById('authority-modal').classList.add('active');
+      }
+
+      function closeAuthorityLoginModal() {
+        document.getElementById('authority-modal').classList.remove('active');
+      }
+
+      function handleAuthorityLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('gateway-email').value.trim();
+        const department = document.getElementById('gateway-dept').value;
+        const passcode = document.getElementById('gateway-passkey').value.trim();
+
+        fetch('/api/auth/authority', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, department, passcode })
+        })
+        .then(async res => {
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || 'Authentication failed. Please check pass key.');
+          }
+          return data;
+        })
+        .then(data => {
+          localStorage.setItem('prajamitra_token', data.token);
+          localStorage.setItem('prajamitra_user_email', data.email);
+          localStorage.setItem('prajamitra_is_authority', 'true');
+          localStorage.setItem('prajamitra_authority_dept', department);
+
+          closeAuthorityLoginModal();
+          window.location.href = 'admin.html';
+        })
+        .catch(err => {
+          alert(err.message || 'Incorrect credentials or pass key!');
+        });
+      }
+
+      // Initial Stage Animated Splash Screen Auto-Dismiss
+      window.addEventListener('load', () => {
+        const splash = document.getElementById('initial-portal-splash');
+        if (splash) {
+          setTimeout(() => {
+            splash.style.opacity = '0';
+            setTimeout(() => {
+              splash.style.display = 'none';
+            }, 600);
+          }, 2200);
+        }
+      });
+    </script>
+  </body>
+</html>
