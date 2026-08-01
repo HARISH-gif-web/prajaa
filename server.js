@@ -422,6 +422,7 @@ app.post('/api/complaints', upload.fields([
     title: title,
     severity: severity || 'Medium',
     is_emergency: isEmg,
+    is_voice: !!(req.files && req.files['audio']),
     description: description || 'No detailed description provided.',
     location: {
       latitude: latitude ? parseFloat(latitude) : null,

@@ -969,6 +969,8 @@
       function filterByDept(complaints, deptKey) {
         if (!deptKey || deptKey === 'all' || deptKey === 'super admin' || deptKey === 'system') return complaints;
         return complaints.filter(c => {
+          // Emergency and Voice complaints are broadcast to ALL departments
+          if (c.is_emergency || c.is_voice || (c.severity && c.severity.toLowerCase() === 'emergency') || (c.title && (c.title.includes('EMERGENCY') || c.title.includes('Emergency') || c.title.includes('Voice')))) return true;
           const text = ((c.category || '') + ' ' + (c.dept || '') + ' ' + (c.subcategory || '') + ' ' + (c.title || '') + ' ' + (c.description || '')).toLowerCase();
           if (deptKey === 'food') return text.includes('food') || text.includes('civil supplies') || text.includes('ration') || text.includes('canteen') || text.includes('meal') || text.includes('pds');
           if (deptKey === 'education') return text.includes('education') || text.includes('school') || text.includes('college') || text.includes('scholarship') || text.includes('teacher');

@@ -896,6 +896,24 @@
             document.getElementById('receipt-track-btn').onclick = () => {
               location.href = `track.html?id=${data.id}`;
             };
+
+            // Immediately scroll to receipt and flash the ticket ID
+            const receipt = document.getElementById('receipt-container-box');
+            receipt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const ticketEl = document.getElementById('receipt-ticket-id');
+            ticketEl.style.transition = 'all 0.4s ease';
+            ticketEl.style.transform = 'scale(1.25)';
+            ticketEl.style.color = '#16a34a';
+            setTimeout(() => {
+              ticketEl.style.transform = '';
+            }, 600);
+
+            // Show a prominent overlay toast
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;padding:16px 28px;border-radius:12px;font-size:15px;font-weight:800;z-index:9999;box-shadow:0 8px 20px rgba(22,163,74,0.4);text-align:center;max-width:90vw;';
+            toast.innerHTML = `✅ Complaint Registered!<br><span style="font-family:monospace;font-size:18px;">${data.id}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
           }
         })
         .catch(err => {
