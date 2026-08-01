@@ -9,7 +9,7 @@ const crypto = require('crypto');
 const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'prajamitra_secure_token_secret_key_2026';
 
 app.use(cors());
